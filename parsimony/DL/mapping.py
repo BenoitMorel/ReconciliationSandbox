@@ -29,7 +29,7 @@ def get_name_to_node(node, name_to_node):
     for child in node.get_children():
         get_name_to_node(child, name_to_node)
 
-def map_gene_to_species(gene_node, leaves_mapping, species_name_to_node):
+def map_gene_to_species_lca(gene_node, leaves_mapping, species_name_to_node):
     """
     Recursively map the gene nodes to species tree nodes
     Requires: the species tree is labelled with its height
@@ -43,7 +43,7 @@ def map_gene_to_species(gene_node, leaves_mapping, species_name_to_node):
         gene_node.set_label("species", label)
         return label
     for child in gene_node.get_children():
-        new_label = map_gene_to_species(child, leaves_mapping, species_name_to_node)
+        new_label = map_gene_to_species_lca(child, leaves_mapping, species_name_to_node)
         if (label == None):
             label = new_label
         else:
