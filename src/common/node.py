@@ -1,5 +1,8 @@
 import sys
-sys.path.insert(0, '../../deps/python-newick/src/')
+import os
+script_dir = os.path.dirname(os.path.abspath(__file__))
+newick_path = os.path.join(script_dir, "../deps/python-newick/src/")
+sys.path.insert(0, newick_path)
 import newick
 
 class Node(object):

@@ -1,3 +1,3 @@
 [submodule "deps/python-newick"]
-	path = src/python-newick
+	path = src/deps/python-newick
 	url = https://github.com/glottobank/python-newick.git

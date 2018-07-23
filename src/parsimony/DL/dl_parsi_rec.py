@@ -1,4 +1,5 @@
 import sys
+sys.path.insert(0, '../../common/')
 import mapping
 import node
 
