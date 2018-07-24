@@ -17,22 +17,41 @@ class SpeciesData(object):
 
 
 class DP_Table:
-  def __init__(self, species_tree, gene_polytomy_node):
+  def __init__(self, 
+          species_tree, 
+          gene_polytomy_node,
+          species_count):
     self.postorder_species_nodes = []
     node.get_nodes_postorder(species_tree, self.postorder_species_nodes)
-    self.species_data = {}
+    self.species_datas = {}
     self.maxk = len(self.postorder_species_nodes) #todo how to define this number??
+    self.species_count = species_count
 
   def get_species_entry(self, species_node):
     if (not (species_node.get_name() in self.species_data)):
       compute_species_entry(self, species_node)
     return self.species_data[species_node.get_name()]
 
-  def compute_species_entry(self, species_node):
-    self.species_data[species.get_name()] = SpeciesData(maxk)
+  def _get_species_count(self, species_node):
+      name = species_node.get_name()
+      if (name in self.species_count):
+          return self.species_count[name]
+      else:
+          return 0
 
-  def compute_species_k_entry(self, species_node, k):
-    pass
+  def compute_species_entry(self, species_node):
+    species_data = SpeciesData(self.maxk)
+    self.species_datas[species_node.get_name()] = species_data
+    if (species_node.is_leaf()):
+        nb = self._get_species_count(species_node)
+        M = species_data.M
+        for k in range(0, self.maxk):
+            M[k] = abs(k + 1 - nb)
+        print("M("+species_node.get_name()+") = " + str(M))
+    else:
+        for child in species_node.get_children():
+            self.compute_species_entry(child)
+
 
 def compute_species_count(leaves_mapping_str):
     species_count = {}
@@ -60,8 +79,8 @@ leaves_mapping_str = mapping.load_leaves_mapping_str(mapping_file)
 print("Mapping: " + str(leaves_mapping_str))
 species_count = compute_species_count(leaves_mapping_str)
 print("Species count: " + str(species_count))
-dp_table = DP_Table(species_tree, gene_polytomy_tree)
-dp_table.compute_species_k_entry(species_tree, 0)
+dp_table = DP_Table(species_tree, gene_polytomy_tree, species_count)
+dp_table.compute_species_entry(species_tree)
 
 
 
