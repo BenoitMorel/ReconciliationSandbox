@@ -14,9 +14,6 @@ class SpeciesData(object):
     def __init__(self, maxk):
       self.C = [0] * maxk
       self.M = [0] * maxk
-      #self.m1 = 0
-      #self.m2 = 0
-      #self.gamma = 0
 
 
 class DP_Table:
@@ -37,6 +34,15 @@ class DP_Table:
   def compute_species_k_entry(self, species_node, k):
     pass
 
+def compute_species_count(leaves_mapping_str):
+    species_count = {}
+    for gene_str in leaves_mapping_str:
+        species_str = leaves_mapping_str[gene_str]
+        if (not species_str in species_count):
+            species_count[species_str] = 1
+        else:
+            species_count[species_str] += 1
+    return species_count
 
 species_newick = sys.argv[1]
 gene_polytomy_newick = sys.argv[2]
@@ -49,6 +55,11 @@ gene_polytomy_tree = node.Node.read(gene_polytomy_newick)
 gene_polytomy_tree.name_unnamed_nodes("g")
 print("Gene polytomy: \n" + gene_polytomy_tree.get_ascii("name"))
 
+
+leaves_mapping_str = mapping.load_leaves_mapping_str(mapping_file)
+print("Mapping: " + str(leaves_mapping_str))
+species_count = compute_species_count(leaves_mapping_str)
+print("Species count: " + str(species_count))
 dp_table = DP_Table(species_tree, gene_polytomy_tree)
 dp_table.compute_species_k_entry(species_tree, 0)
 
