@@ -106,3 +106,11 @@ def lca(node1, node2):
             node2 = node2.get_parent()
     return node1
 
+def get_nodes_postorder(node, nodes_list):
+  for child in node.get_children():
+    get_nodes_postorder(child, nodes_list)
+  nodes_list.append(node)
+
+
+
+
