@@ -19,12 +19,12 @@ class SpeciesData(object):
 class DP_Table:
   def __init__(self, 
           species_tree, 
-          gene_polytomy_node,
           species_count):
-    self.postorder_species_nodes = []
-    node.get_nodes_postorder(species_tree, self.postorder_species_nodes)
     self.species_data = {}
-    self.maxk = len(self.postorder_species_nodes) #todo how to define this number??
+    self.maxk = 0
+    for species in species_count:
+        self.maxk = max(species_count[species], self.maxk)
+    self.maxk += 2
     self.species_count = species_count
 
   def get_species_entry(self, species_node):
@@ -94,7 +94,7 @@ leaves_mapping_str = mapping.load_leaves_mapping_str(mapping_file)
 print("Mapping: " + str(leaves_mapping_str))
 species_count = compute_species_count(leaves_mapping_str)
 print("Species count: " + str(species_count))
-dp_table = DP_Table(species_tree, gene_polytomy_tree, species_count)
+dp_table = DP_Table(species_tree, species_count)
 dp_table.compute_species_entry(species_tree)
 
 
