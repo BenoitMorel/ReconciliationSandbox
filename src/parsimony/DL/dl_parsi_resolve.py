@@ -23,13 +23,13 @@ class DP_Table:
           species_count):
     self.postorder_species_nodes = []
     node.get_nodes_postorder(species_tree, self.postorder_species_nodes)
-    self.species_datas = {}
+    self.species_data = {}
     self.maxk = len(self.postorder_species_nodes) #todo how to define this number??
     self.species_count = species_count
 
   def get_species_entry(self, species_node):
     if (not (species_node.get_name() in self.species_data)):
-      compute_species_entry(self, species_node)
+      self.compute_species_entry(species_node)
     return self.species_data[species_node.get_name()]
 
   def _get_species_count(self, species_node):
@@ -41,17 +41,32 @@ class DP_Table:
 
   def compute_species_entry(self, species_node):
     species_data = SpeciesData(self.maxk)
-    self.species_datas[species_node.get_name()] = species_data
+    self.species_data[species_node.get_name()] = species_data
+    nb = self._get_species_count(species_node)
+    M = species_data.M
     if (species_node.is_leaf()):
-        nb = self._get_species_count(species_node)
-        M = species_data.M
         for k in range(0, self.maxk):
             M[k] = abs(k + 1 - nb)
-        print("M("+species_node.get_name()+") = " + str(M))
     else:
-        for child in species_node.get_children():
-            self.compute_species_entry(child)
-
+        child_left = species_node.get_children()[0]
+        child_right = species_node.get_children()[1]
+        entry_left = self.get_species_entry(child_left)
+        entry_right = self.get_species_entry(child_right)
+        C = species_data.C
+        for k in range(0, nb):
+            C[k] = float("inf")
+        for k in range(nb, self.maxk):
+            C[k] = entry_left.M[k-nb] + entry_right.M[k-nb]
+        print("C("+species_node.get_name()+") = " + str(C))
+        for k in range(0, self.maxk):
+            M[k] = float("inf")
+            for i in range(0, self.maxk):
+                temp = C[i] + abs(k - i)
+                if (M[k] > temp):
+                    M[k] = temp
+    print("M("+species_node.get_name()+") = " + str(M))
+                    
+            
 
 def compute_species_count(leaves_mapping_str):
     species_count = {}
