@@ -10,27 +10,16 @@ if (len(sys.argv) != 4):
 print("This script implements the algorithm presented in \"An optimal reconciliation algorithm for gene trees with polytomies\" (Lafond et. al)")
 print("Variable (k, C, M...) are also named from this article notations")
 
-class SpeciesData(object):
-    def __init__(self, maxk):
-      self.C = [0] * maxk
-      self.M = [0] * maxk
-
-
 class DP_Table:
   def __init__(self, 
           species_tree, 
           species_count):
-    self.species_data = {}
+    self.dp_table = {}
     self.maxk = 0
     for species in species_count:
         self.maxk = max(species_count[species], self.maxk)
     self.maxk += 2
     self.species_count = species_count
-
-  def get_species_entry(self, species_node):
-    if (not (species_node.get_name() in self.species_data)):
-      self.compute_species_entry(species_node)
-    return self.species_data[species_node.get_name()]
 
   def _get_species_count(self, species_node):
       name = species_node.get_name()
@@ -40,32 +29,28 @@ class DP_Table:
           return 0
 
   def compute_species_entry(self, species_node):
-    species_data = SpeciesData(self.maxk)
-    self.species_data[species_node.get_name()] = species_data
+    M = [0] * self.maxk
+    self.dp_table[species_node.get_name()] = M
     nb = self._get_species_count(species_node)
-    M = species_data.M
     if (species_node.is_leaf()):
         for k in range(0, self.maxk):
             M[k] = abs(k + 1 - nb)
     else:
         child_left = species_node.get_children()[0]
         child_right = species_node.get_children()[1]
-        entry_left = self.get_species_entry(child_left)
-        entry_right = self.get_species_entry(child_right)
-        C = species_data.C
-        for k in range(0, nb):
-            C[k] = float("inf")
+        M_left = self.compute_species_entry(child_left)
+        M_right = self.compute_species_entry(child_right)
+        C = [float("inf")] * self.maxk
         for k in range(nb, self.maxk):
-            C[k] = entry_left.M[k-nb] + entry_right.M[k-nb]
-        print("C("+species_node.get_name()+") = " + str(C))
+            C[k] = M_left[k-nb] + M_right[k-nb]
         for k in range(0, self.maxk):
             M[k] = float("inf")
-            for i in range(0, self.maxk):
+            for i in range(nb, self.maxk):
                 temp = C[i] + abs(k - i)
                 if (M[k] > temp):
                     M[k] = temp
     print("M("+species_node.get_name()+") = " + str(M))
-                    
+    return M                
             
 
 def compute_species_count(leaves_mapping_str):
